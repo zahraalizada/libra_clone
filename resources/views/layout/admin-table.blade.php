@@ -57,13 +57,13 @@
                 <p class="centered"><a href="profile.html"><img src="{{asset('admin/img/ui-sam.jpg')}}" class="img-circle" width="80"></a></p>
                 <h5 class="centered">Sam Soffes</h5>
                 <li class="mt">
-                    <a href="index.html">
+                    <a class="{{ Request::is('dashboard') ? 'dashboard' : '' }}" href="#">
                         <i class="fa fa-dashboard"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{{route('author.index')}}">
+                    <a class="{{ Request::is('author') ? 'active' : '' }}" href="{{route('author.index')}}">
                         <i class="fa fa-dashboard"></i>
                         <span>Authors</span>
                     </a>

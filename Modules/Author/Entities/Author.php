@@ -11,5 +11,4 @@ class Author extends Model
 
     protected $guarded = [];
 
-
 }

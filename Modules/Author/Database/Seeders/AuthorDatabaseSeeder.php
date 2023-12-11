@@ -18,9 +18,22 @@ class AuthorDatabaseSeeder extends Seeder
         Model::unguard();
 
         Author::truncate();
-        Author::create(['name' => 'Arthur Conan Doyle']);
-        Author::create(['name' => 'Jules Verne']);
-        Author::create(['name' => 'Agatha Christie']);
+        Author::create([
+            'name' => 'Arthur Conan Doyle',
+            'description' => 'Detective',
+            'image' => 'default image'
+
+        ]);
+        Author::create([
+            'name' => 'Jules Verne',
+            'description' => 'Adventure',
+            'image' => 'default image'
+        ]);
+        Author::create([
+            'name' => 'Agatha Christie',
+            'description' => 'Detective',
+            'image' => 'default image'
+        ]);
         // $this->call("OthersTableSeeder");
     }
 }

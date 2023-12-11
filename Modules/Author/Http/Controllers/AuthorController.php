@@ -5,7 +5,12 @@ namespace Modules\Author\Http\Controllers;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Intervention\Image\Facades\Image;
 use Modules\Author\Entities\Author;
+
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Imagick\Driver;
+
 
 class AuthorController extends Controller
 {
@@ -35,8 +40,43 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
+//        if ($request->hasFile('image')) {
+//            // variable = file-dan gelen image-> hashName ile unikal ad yarat
+//            $hashName = $request->file('image')->hashName();
+//            // request-den image ile gelen fayli -> store et storage-app-public papkasinda avatars adli papka yarat ve fayli yukle)
+//            $request->file('image')->storeAs('avatars', $hashName);
+//        }
+
+
+        if ($request->hasFile('image')) {
+            // Dosya yolunu al
+            $dosya = $request->file('image');
+
+
+            // HashName ile dosyaya benzersiz bir ad ver
+            $hashName = $dosya->hashName();
+
+            // Resmi Intervention Image ile yükle
+            $imageSm = Image::make($dosya);
+            $imageMd = Image::make($dosya);
+            $imageLg = Image::make($dosya);
+
+            // Boyutu kontrol et ve gerekirse yeniden boyutlandır
+            $imageSm->fit(300, 300);
+            $imageMd->fit(500, 500);
+            $imageLg->fit(700, 700);
+
+            // Storage'a yükle (storage/app/public/avatars altına)
+//            $image->storeAs('avatars', $hashName);
+            $imageSm->save(storage_path('app/avatars/sm' . $hashName));
+            $imageMd->save(storage_path('app/avatars/md' . $hashName));
+            $imageLg->save(storage_path('app/avatars/lg' . $hashName));
+        }
+
         Author::create([
-            'name' => $request->name
+            'name' => $request->name,
+            'description' => $request->description,
+            'image' => $hashName
         ]);
 
         return redirect()->route('author.index');
@@ -60,7 +100,7 @@ class AuthorController extends Controller
     public function edit($id)
     {
         $author = Author::find($id);
-        return view('author::edit',compact('author'));
+        return view('author::edit', compact('author'));
     }
 
     /**
@@ -71,9 +111,17 @@ class AuthorController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        if ($request->hasFile('image')) {
+            $hashName = $request->file('image')->hashName();
+            $request->file('image')->storeAs('avatars', $hashName);
+        }
+
         $author = Author::find($id);
         $author->update([
-            'name' => $request->name
+            'name' => $request->name,
+            'description' => $request->name,
+            'image' => $request->image
         ]);
 
         return redirect()->route('author.index');

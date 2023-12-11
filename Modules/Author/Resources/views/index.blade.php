@@ -16,6 +16,8 @@
                 <tr>
                     <th>#</th>
                     <th>Full Name</th>
+                    <th>Description</th>
+                    <th>Image</th>
                     <th class="text-right">Action</th>
                 </tr>
                 </thead>
@@ -24,6 +26,8 @@
                     <tr>
                         <td>{{$loop->iteration }}</td>
                         <td>{{$author->name}}</td>
+                        <td>{{$author->description}}</td>
+                        <td>{{$author->image}}</td>
                         <td class="text-right">
                             <a href="{{route('author.edit',$author->id)}}" class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i></a>
                             <a  href="{{route('author.delete',$author->id)}}" class="btn btn-danger btn-xs"><i class="fa fa-trash-o "></i></a>
