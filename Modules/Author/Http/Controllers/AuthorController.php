@@ -2,18 +2,30 @@
 
 namespace Modules\Author\Http\Controllers;
 
+
+use App\Services\ImageServices;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Modules\Author\Entities\Author;
 
-use Intervention\Image\ImageManager;
+
 use Intervention\Image\Drivers\Imagick\Driver;
+use Psy\Util\Str;
 
 
 class AuthorController extends Controller
 {
+    private ImageServices $imageServices;
+
+    public function __construct(ImageServices $imageServices)
+    {
+        $this->imageServices = $imageServices;
+    }
+
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -49,28 +61,31 @@ class AuthorController extends Controller
 
 
         if ($request->hasFile('image')) {
-            // Dosya yolunu al
+            // Papka yolunu al
             $dosya = $request->file('image');
-
-
             // HashName ile dosyaya benzersiz bir ad ver
             $hashName = $dosya->hashName();
 
-            // Resmi Intervention Image ile yükle
-            $imageSm = Image::make($dosya);
-            $imageMd = Image::make($dosya);
-            $imageLg = Image::make($dosya);
+            $this->imageServices->setFile($dosya)
+                ->setWidth(300)
+                ->setHeight(300)
+                ->setFolderName("sm")
+                ->resize()
+                ->upload();
 
-            // Boyutu kontrol et ve gerekirse yeniden boyutlandır
-            $imageSm->fit(300, 300);
-            $imageMd->fit(500, 500);
-            $imageLg->fit(700, 700);
+            $this->imageServices->setFile($dosya)
+                ->setFolderName("md")
+                ->setWidth(500)
+                ->setHeight(500)
+                ->resize()
+                ->upload();
 
-            // Storage'a yükle (storage/app/public/avatars altına)
-//            $image->storeAs('avatars', $hashName);
-            $imageSm->save(storage_path('app/avatars/sm' . $hashName));
-            $imageMd->save(storage_path('app/avatars/md' . $hashName));
-            $imageLg->save(storage_path('app/avatars/lg' . $hashName));
+            $this->imageServices->setFile($dosya)
+                ->setFolderName("lg")
+                ->setWidth(700)
+                ->setHeight(700)
+                ->resize()
+                ->upload();
         }
 
         Author::create([
@@ -111,7 +126,6 @@ class AuthorController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         if ($request->hasFile('image')) {
             $hashName = $request->file('image')->hashName();
             $request->file('image')->storeAs('avatars', $hashName);
